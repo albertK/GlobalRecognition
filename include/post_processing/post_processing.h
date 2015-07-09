@@ -38,7 +38,6 @@ public:
 	
 protected:
 	//typename pcl::IterativeClosestPoint<PointT, PointT> icp_;
-	typename pcl::VoxelGrid<PointT> down_;
 	typename pcl::GreedyVerification<PointT, PointT> greedy_hv_;
 	typename std::map<std::string, PointCloudT> models_;
 	PointCloudPtrT cluster_;
@@ -51,14 +50,12 @@ protected:
 };
 
 template<typename PointT>
-PostProcessing<PointT>::PostProcessing():cluster_(new PointCloudT), scene_(new PointCloudT), greedy_hv_(1.0)
+PostProcessing<PointT>::PostProcessing():cluster_(new PointCloudT), scene_(new PointCloudT), greedy_hv_(2.0)
 {
 	leaf_ = 0.005f;
 	
 	//icp_.setMaxCorrespondenceDistance(2.0*leaf_);
 	//icp_.setMaximumIterations(150);
-	
-	down_.setLeafSize (leaf_, leaf_, leaf_);
 	
 	greedy_hv_.setResolution(leaf_);
 	greedy_hv_.setInlierThreshold(leaf_);
@@ -68,6 +65,7 @@ template<typename PointT>
 void PostProcessing<PointT>::setResolution(float leaf)
 {
     leaf_ = leaf;
+    
     greedy_hv_.setResolution(leaf_);
     greedy_hv_.setInlierThreshold(leaf_);
 }
@@ -76,6 +74,9 @@ template<typename PointT>
 void PostProcessing<PointT>::setInputCluster(PointCloudPtrT cluster)
 {
 	cluster_->clear();
+	
+	typename pcl::VoxelGrid<PointT> down_;
+	down_.setLeafSize (leaf_, leaf_, leaf_);
 	down_.setInputCloud(cluster);
 	down_.filter(*cluster_);
 }
@@ -84,6 +85,8 @@ template<typename PointT>
 void PostProcessing<PointT>::setInputScene(PointCloudPtrT scene)
 {
 	scene_->clear();
+	typename pcl::VoxelGrid<PointT> down_;
+	down_.setLeafSize (leaf_, leaf_, leaf_);
 	down_.setInputCloud(scene);
 	down_.filter(*scene_);
 }
@@ -106,6 +109,8 @@ void PostProcessing<PointT>::setInputModels(std::string path)
 		{
 			PointCloudT model;
 			pcl::io::loadPCDFile<PointT>((it->path()/(model_name+ std::string(".pcd"))).string(), model);
+			typename pcl::VoxelGrid<PointT> down_;
+			down_.setLeafSize (leaf_, leaf_, leaf_);
 			down_.setInputCloud(model.makeShared());
 			down_.filter(model);
 			models_[model_name] = model;
@@ -124,6 +129,8 @@ void PostProcessing<PointT>::refineHypotheses()
 		icp_.setMaxCorrespondenceDistance(2.0*leaf_);
 		icp_.setMaximumIterations(150);
 		
+		typename pcl::VoxelGrid<PointT> down_;
+		down_.setLeafSize (leaf_, leaf_, leaf_);
 		down_.setInputCloud(hypotheses_[i].cloud.makeShared());
 		down_.filter(hypotheses_[i].cloud);
 		
