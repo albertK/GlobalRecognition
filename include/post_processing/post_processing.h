@@ -50,7 +50,7 @@ protected:
 };
 
 template<typename PointT>
-PostProcessing<PointT>::PostProcessing():cluster_(new PointCloudT), scene_(new PointCloudT), greedy_hv_(2.0)
+PostProcessing<PointT>::PostProcessing():cluster_(new PointCloudT), scene_(new PointCloudT), greedy_hv_(1.0)
 {
 	leaf_ = 0.005f;
 	

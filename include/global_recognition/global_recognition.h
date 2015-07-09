@@ -129,13 +129,13 @@ bool GlobalRecognition<PointT>::init(std::string db_path, std::string roi)
 		recognition_database_.setDescriptor("ourcvfh");
 	}
 	
-	pre_processing_.setLeafSize(0.002f);
+	pre_processing_.setLeafSize(0.003f);
 	pre_processing_.setClusterSize(500,10000);
 	pre_processing_.setClusterTolerance(0.04f);
 	
 	recognition_database_.loadDB(db_path);
 	
-	post_processing_.setResolution(0.01f);
+	post_processing_.setResolution(0.005f);
 	post_processing_.setInputModels(db_path);
 	
 	return true;

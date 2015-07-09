@@ -61,7 +61,8 @@ int main(int argc, char** argv)
 			
 			std::cout<<"Hypotheses for cluster["<<i<<"]:\n";
 			//for(unsigned int j = 0; j < results[i].size(); ++j)
-			//{
+			if(results[i].size() >= 1)
+			{
 				std::cout<<"Type = "<<results[i][0].type<<std::endl;
 				std::cout<<"Pose = \n"<<results[i][0].pose<<std::endl;
 				
@@ -70,7 +71,11 @@ int main(int argc, char** argv)
 				visualizer.setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 4.0, "hypothesis");
 				visualizer.spin();
 				visualizer.removePointCloud("hypothesis");
-			//}
+			}
+			else
+			{
+				std::cout<<"Recognition failed...\n";
+			}
 			
 			visualizer.removePointCloud("cluster");
 		}
