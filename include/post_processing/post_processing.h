@@ -24,7 +24,7 @@ public:
 	
 	PostProcessing();
 	void setInputModels(std::string path);
-	void setResolution(float leaf){leaf_ = leaf;}
+	void setResolution(float leaf);
 	void setInputCluster(PointCloudPtrT cluster);
 	void setInputScene(PointCloudPtrT scene);
 	void setInputHypotheses(HypothesesT& hypotheses);
@@ -58,6 +58,14 @@ PostProcessing<PointT>::PostProcessing():cluster_(new PointCloudT), scene_(new P
 	
 	greedy_hv_.setResolution(leaf_);
 	greedy_hv_.setInlierThreshold(leaf_);
+}
+
+template<typename PointT>
+void PostProcessing<PointT>::setResolution(float leaf)
+{
+    leaf_ = leaf;
+    greedy_hv_.setResolution(leaf_);
+    greedy_hv_.setInlierThreshold(leaf_);
 }
 
 template<typename PointT>
