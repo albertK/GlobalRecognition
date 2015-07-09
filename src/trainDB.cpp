@@ -24,7 +24,7 @@ int main(int argc, char** argv)
 	}
 	
 	RecognitionDatabase<pcl::PointXYZ, pcl::ESFSignature640, flann::L1<float> > db;
-	db.trainDB(model, trained, true, 3);
+	db.trainDB(model, trained, true, 2, 0.002f);
 	
 	return 0;
 }
