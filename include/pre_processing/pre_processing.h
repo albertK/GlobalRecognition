@@ -100,7 +100,7 @@ PreProcessing<PointT>::PreProcessing():cloud_(new PointCloudT), plane_coeff_(new
 	//Cluster extraction
 	min_pts_ = 300;
 	max_pts_ = 1500;
-	cluster_tolerance_ = 0.07;
+	cluster_tolerance_ = 0.02;
 }
 
 //Main
