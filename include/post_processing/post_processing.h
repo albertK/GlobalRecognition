@@ -9,6 +9,7 @@
 #include <pcl/recognition/hv/greedy_verification.h>
 #include <pcl/io/pcd_io.h>
 #include <pcl/common/transforms.h>
+#include <pcl/filters/voxel_grid.h>
 
 #include "recognition_database/hypothesis.h"
 
@@ -37,6 +38,7 @@ public:
 	
 protected:
 	//typename pcl::IterativeClosestPoint<PointT, PointT> icp_;
+	typename pcl::VoxelGrid<PointT> down_;
 	typename pcl::GreedyVerification<PointT, PointT> greedy_hv_;
 	typename std::map<std::string, PointCloudT> models_;
 	PointCloudPtrT cluster_;
@@ -56,6 +58,8 @@ PostProcessing<PointT>::PostProcessing():cluster_(new PointCloudT), scene_(new P
 	//icp_.setMaxCorrespondenceDistance(2.0*leaf_);
 	//icp_.setMaximumIterations(150);
 	
+	down_.setLeafSize (leaf_, leaf_, leaf_);
+	
 	greedy_hv_.setResolution(leaf_);
 	greedy_hv_.setInlierThreshold(leaf_);
 }
@@ -72,14 +76,16 @@ template<typename PointT>
 void PostProcessing<PointT>::setInputCluster(PointCloudPtrT cluster)
 {
 	cluster_->clear();
-	pcl::copyPointCloud<PointT>(*cluster, *cluster_);
+	down_.setInputCloud(cluster);
+	down_.filter(*cluster_);
 }
 
 template<typename PointT>
 void PostProcessing<PointT>::setInputScene(PointCloudPtrT scene)
 {
 	scene_->clear();
-	pcl::copyPointCloud<PointT>(*scene, *scene_);
+	down_.setInputCloud(scene);
+	down_.filter(*scene_);
 }
 
 template<typename PointT>
@@ -100,6 +106,8 @@ void PostProcessing<PointT>::setInputModels(std::string path)
 		{
 			PointCloudT model;
 			pcl::io::loadPCDFile<PointT>((it->path()/(model_name+ std::string(".pcd"))).string(), model);
+			down_.setInputCloud(model.makeShared());
+			down_.filter(model);
 			models_[model_name] = model;
 		}
 	}
@@ -115,6 +123,10 @@ void PostProcessing<PointT>::refineHypotheses()
 		typename pcl::IterativeClosestPoint<PointT, PointT> icp_;
 		icp_.setMaxCorrespondenceDistance(2.0*leaf_);
 		icp_.setMaximumIterations(150);
+		
+		down_.setInputCloud(hypotheses_[i].cloud.makeShared());
+		down_.filter(hypotheses_[i].cloud);
+		
 		icp_.setInputSource(hypotheses_[i].cloud.makeShared());
 		icp_.setInputTarget(cluster_);
 		icp_.align(aligned);
@@ -123,7 +135,6 @@ void PostProcessing<PointT>::refineHypotheses()
 		{
 			hypotheses_[i].cloud = aligned;
 			hypotheses_[i].pose = icp_.getFinalTransformation() * hypotheses_[i].pose;
-			
 		}
 		hypotheses_[i].fitness = icp_.getFitnessScore();//the lower the better
 	}
