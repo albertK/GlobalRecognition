@@ -163,8 +163,10 @@ void PostProcessing<PointT>::verifyHypotheses()
 		transformed_models.push_back(transformed_model);
 	}
 	
-	greedy_hv_.setSceneCloud(scene_);
-	greedy_hv_.setOcclusionCloud(scene_);
+	//greedy_hv_.setSceneCloud(scene_);
+	//greedy_hv_.setOcclusionCloud(scene_);
+	greedy_hv_.setSceneCloud(cluster_);
+	greedy_hv_.setOcclusionCloud(cluster_);
 	greedy_hv_.addModels(transformed_models, true);
 	greedy_hv_.verify();
 	std::vector<bool> mask_hv;
