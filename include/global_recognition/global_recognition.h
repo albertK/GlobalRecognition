@@ -135,7 +135,7 @@ bool GlobalRecognition<PointT>::init(std::string db_path, std::string roi)
 	
 	recognition_database_.loadDB(db_path);
 	
-	post_processing_.setResolution(0.005f);
+	post_processing_.setResolution(0.004f);
 	post_processing_.setInputModels(db_path);
 	
 	return true;
