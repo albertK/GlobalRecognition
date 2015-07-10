@@ -25,12 +25,14 @@ public:
 	typedef typename std::vector<HypothesisT> HypothesesT;
 	
 	CRHPoseEstimation();
-	void estimate();
+	virtual void estimate();
+	void setMaxResults(int max_results){max_results_ = max_results;}
 
 protected:
 	pcl::NormalEstimationOMP<PointT, pcl::Normal> normal_estimation_;
 	pcl::CRHEstimation<PointT, pcl::Normal, pcl::Histogram<90> > crh_;
 	pcl::CRHAlignment<PointT, 90> crha_;
+	int max_results_;
 };
 
 template<typename PointT>
@@ -39,6 +41,8 @@ CRHPoseEstimation<PointT>::CRHPoseEstimation()
 	normal_estimation_.setRadiusSearch(0.01f);
 	typename pcl::search::KdTree<PointT>::Ptr kdtree(new pcl::search::KdTree<PointT>);
 	normal_estimation_.setSearchMethod(kdtree);
+	
+	max_results_ = 5;
 }
 
 template<typename PointT>
@@ -102,7 +106,7 @@ void CRHPoseEstimation<PointT>::estimate()
 	
 	result_hypotheses_.clear();
 	result_hypotheses_.resize(transforms.size());
-	for(unsigned int i = 0; i < transforms.size(); ++i)
+	for(unsigned int i = 0; i < transforms.size() && i < max_results_; ++i)
 	{
 		result_hypotheses_[i].type = input_hypothesis_.type;
 		result_hypotheses_[i].fitness = input_hypothesis_.fitness;
