@@ -3,9 +3,10 @@
 ## 1. Installation
 Before installing this package, make sure you have PCL-1.8 installed. 
 
+	sudo apt-get install libeigen3-dev libvtk5-dev libvtk-java python-vtk libflann-dev libboost-all-dev libopenni-dev libopenni2-dev build-essential cmake git
 	git clone https://github.com/PointCloudLibrary/pcl pcl-trunk
 	cd pcl-trunk && mkdir build && cd build
-	cmake -DCMAKE_BUILD_TYPE=Release .. 
+	cmake -DBUILD_apps=true -DBUILD_apps_3d_rec_framework=true -DBUILD_examples=true ..
 	make
 	sudo make install
 
