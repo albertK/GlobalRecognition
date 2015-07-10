@@ -31,7 +31,7 @@ public:
 	typedef Hypothesis<PointT> HypothesisT;
 	typedef typename std::vector<std::vector<HypothesisT> > Hypotheses;
 	
-	GlobalRecognition():scene_(new PointCloudT),k_(10){}
+	GlobalRecognition():scene_(new PointCloudT),k_(9){}
 	~GlobalRecognition(){}
 	bool init(std::string db_path, std::string roi);
 	void setInputScene(const PointCloudPtrT scene);
@@ -131,11 +131,13 @@ bool GlobalRecognition<PointT>::init(std::string db_path, std::string roi)
 	
 	pre_processing_.setLeafSize(0.003f);
 	pre_processing_.setClusterSize(500,10000);
-	pre_processing_.setClusterTolerance(0.04f);
+	pre_processing_.setClusterTolerance(0.05f);
 	
 	recognition_database_.loadDB(db_path);
 	
-	post_processing_.setResolution(0.004f);
+	pose_estimation_.setMaxResults(3);
+	
+	post_processing_.setResolution(0.005f);
 	post_processing_.setInputModels(db_path);
 	
 	return true;
