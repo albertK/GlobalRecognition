@@ -26,7 +26,7 @@ namespace pcl
 		typename std::vector<typename pcl::search::KdTree<ModelT>::Ptr> visible_models_downsampled_trees_;
 		
 	public:
-		HeuristicVerification():pass_thres_(0.9){}
+		HeuristicVerification():pass_thres_(0.8){}
 		void setPassThres(float pass_thres){pass_thres_ = pass_thres;}
 		void init();
 		virtual void verify();
