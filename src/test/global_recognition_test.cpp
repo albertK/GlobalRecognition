@@ -60,25 +60,23 @@ int main(int argc, char** argv)
 			visualizer.spinOnce();
 			
 			std::cout<<"Hypotheses for cluster["<<i<<"]:\n";
-			for(unsigned int j = 0; j < results[i].size(); ++j)
-			//if(results[i].size() >= 1)
+			//for(unsigned int j = 0; j < results[i].size(); ++j)
+			if(results[i].size() >= 1)
 			{
-				std::cout<<"Type = "<<results[i][j].type<<std::endl;
-				std::cout<<"Fitness = "<<results[i][j].fitness<<std::endl;
-				std::cout<<"Pose = \n"<<results[i][j].pose<<std::endl;
+				std::cout<<"Type = "<<results[i][0].type<<std::endl;
+				std::cout<<"Fitness = "<<results[i][0].fitness<<std::endl;
+				std::cout<<"Pose = \n"<<results[i][0].pose<<std::endl;
 
-				pcl::visualization::PointCloudColorHandlerCustom<pcl::PointXYZ> result_color(results[i][j].cloud.makeShared(), 0.0, 0.0, 255.0);
-				visualizer.addPointCloud<pcl::PointXYZ>(results[i][j].cloud.makeShared(), result_color, "hypothesis");
+				pcl::visualization::PointCloudColorHandlerCustom<pcl::PointXYZ> result_color(results[i][0].cloud.makeShared(), 0.0, 0.0, 255.0);
+				visualizer.addPointCloud<pcl::PointXYZ>(results[i][0].cloud.makeShared(), result_color, "hypothesis");
 				visualizer.setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 4.0, "hypothesis");
 				visualizer.spin();
 				visualizer.removePointCloud("hypothesis");
 			}
-			/*
 			else
 			{
 				std::cout<<"Recognition failed...\n";
 			}
-			*/
 			
 			visualizer.removePointCloud("cluster");
 		}
