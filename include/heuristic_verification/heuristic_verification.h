@@ -13,6 +13,8 @@ namespace pcl
 	{
 		using HypothesisVerification<ModelT, SceneT>::mask_;
 		using HypothesisVerification<ModelT, SceneT>::scene_cloud_;
+		using HypothesisVerification<ModelT, SceneT>::scene_cloud_downsampled_;
+		using HypothesisVerification<ModelT, SceneT>::scene_downsampled_tree_;
 		using HypothesisVerification<ModelT, SceneT>::visible_models_;
 		using HypothesisVerification<ModelT, SceneT>::resolution_;
 		using HypothesisVerification<ModelT, SceneT>::inliers_threshold_;
@@ -20,7 +22,6 @@ namespace pcl
 	protected:
 		std::vector<float> fitness_scores_;
 		float pass_thres_;
-		typename pcl::PointCloud<SceneT>::Ptr scene_cloud_downsampled_;
 		typename std::vector<typename pcl::PointCloud<ModelT>::Ptr> visible_models_downsampled_;
 		typename std::vector<typename pcl::search::KdTree<ModelT>::Ptr> visible_models_downsampled_trees_;
 		
@@ -44,13 +45,6 @@ void pcl::HeuristicVerification<ModelT, SceneT>::init()
 		fitness_scores_.at(i) = 0.0;
 		mask_[i] = false;
 	}
-	
-	//downsample scene_cloud_
-	scene_cloud_downsampled_.reset(new pcl::PointCloud<SceneT>());
-	typename pcl::VoxelGrid<SceneT> down_;
-	down_.setLeafSize(resolution_, resolution_, resolution_);
-	down_.setInputCloud(scene_cloud_);
-	down_.filter(*scene_cloud_downsampled_);
 	
 	//downsample visible_models_
 	visible_models_downsampled_.clear();
@@ -85,14 +79,25 @@ void pcl::HeuristicVerification<ModelT, SceneT>::verify()
 		int num_inliers = 0;
 		std::vector<int> nn_indices;
 		std::vector<float> nn_distances;
-		for(unsigned int j = 0; j < scene_cloud_->points.size(); ++j)
+		if(visible_models_downsampled_.at(i)->size() != 0)
 		{
-			if(visible_models_downsampled_.at(i)->size() != 0)
-				if(visible_models_downsampled_trees_.at(i)->radiusSearch(scene_cloud_->points[j], inliers_threshold_, nn_indices, nn_distances))
+			for(unsigned int j = 0; j < scene_cloud_downsampled_->size(); ++j)
+			{
+				if(visible_models_downsampled_trees_.at(i)->radiusSearch(scene_cloud_downsampled_->points[j], inliers_threshold_, nn_indices, nn_distances))
 					num_inliers++;
+			}
 		}
+		float score_explain_cluster = ((float) num_inliers) / ((float) scene_cloud_downsampled_->size());
 		
-		fitness_scores_.at(i) = ((float) num_inliers) / ((float) scene_cloud_->points.size());
+		num_inliers = 0;
+		for(unsigned int j = 0; j < visible_models_downsampled_.at(i)->size(); ++j)
+		{
+			if(scene_downsampled_tree_->radiusSearch(visible_models_downsampled_.at(i)->points[j], inliers_threshold_, nn_indices, nn_distances))
+				num_inliers++;
+		}
+		float score_explain_model = ((float) num_inliers) / ((float) visible_models_downsampled_.at(i)->size());
+		
+		fitness_scores_.at(i) = std::min(score_explain_cluster, score_explain_model);
 		if(fitness_scores_.at(i) > pass_thres_)
 			mask_.at(i) = true;
 	}
