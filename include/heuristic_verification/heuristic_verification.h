@@ -38,6 +38,7 @@ void pcl::HeuristicVerification<ModelT, SceneT>::init()
 {
 	//init mask_ and fitness_scores_
 	fitness_scores_.resize(visible_models_.size());
+	mask_.resize(visible_models_.size());
 	for(unsigned int i = 0; i < visible_models_.size(); ++i)
 	{
 		fitness_scores_.at(i) = 0.0;
@@ -69,7 +70,8 @@ void pcl::HeuristicVerification<ModelT, SceneT>::init()
 	for(unsigned int i = 0; i < visible_models_downsampled_.size(); ++i)
 	{
 		visible_models_downsampled_trees_.at(i).reset(new pcl::search::KdTree<ModelT>);
-		visible_models_downsampled_trees_.at(i).setInputCloud(visible_models_downsampled_.at(i));
+		if(visible_models_downsampled_.at(i)->size() != 0)
+			visible_models_downsampled_trees_.at(i)->setInputCloud(visible_models_downsampled_.at(i));
 	}
 }
 
@@ -85,8 +87,9 @@ void pcl::HeuristicVerification<ModelT, SceneT>::verify()
 		std::vector<float> nn_distances;
 		for(unsigned int j = 0; j < scene_cloud_->points.size(); ++j)
 		{
-			if(visible_models_downsampled_trees_.at(i)->radiusSearch(scene_cloud_->points[i], inliers_threshold_, nn_indices, nn_distances))
-				num_inliers++;
+			if(visible_models_downsampled_.at(i)->size() != 0)
+				if(visible_models_downsampled_trees_.at(i)->radiusSearch(scene_cloud_->points[j], inliers_threshold_, nn_indices, nn_distances))
+					num_inliers++;
 		}
 		
 		fitness_scores_.at(i) = ((float) num_inliers) / ((float) scene_cloud_->points.size());
@@ -94,3 +97,5 @@ void pcl::HeuristicVerification<ModelT, SceneT>::verify()
 			mask_.at(i) = true;
 	}
 }
+
+#endif
