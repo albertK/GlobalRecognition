@@ -130,7 +130,7 @@ bool GlobalRecognition<PointT>::init(std::string db_path, std::string roi)
 	}
 	
 	pre_processing_.setLeafSize(0.003f);
-	pre_processing_.setClusterSize(500,10000);
+	pre_processing_.setClusterSize(300,5000);
 	pre_processing_.setClusterTolerance(0.05f);
 	
 	recognition_database_.loadDB(db_path);
