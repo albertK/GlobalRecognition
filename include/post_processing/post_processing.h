@@ -6,7 +6,8 @@
 #include <omp.h>
 
 #include <pcl/registration/icp.h>
-#include <pcl/recognition/hv/greedy_verification.h>
+//#include <pcl/recognition/hv/greedy_verification.h>
+#include <heuristic_verification/heuristic_verification.h>
 #include <pcl/io/pcd_io.h>
 #include <pcl/common/transforms.h>
 #include <pcl/filters/voxel_grid.h>
@@ -37,8 +38,7 @@ public:
 	void verify();
 	
 protected:
-	//typename pcl::IterativeClosestPoint<PointT, PointT> icp_;
-	typename pcl::GreedyVerification<PointT, PointT> greedy_hv_;
+	typename pcl::HeuristicVerification<PointT, PointT> heuristic_hv_;
 	typename std::map<std::string, PointCloudT> models_;
 	PointCloudPtrT cluster_;
 	PointCloudPtrT scene_;
@@ -50,15 +50,12 @@ protected:
 };
 
 template<typename PointT>
-PostProcessing<PointT>::PostProcessing():cluster_(new PointCloudT), scene_(new PointCloudT), greedy_hv_(1.0)
+PostProcessing<PointT>::PostProcessing():cluster_(new PointCloudT), scene_(new PointCloudT)
 {
 	leaf_ = 0.005f;
 	
-	//icp_.setMaxCorrespondenceDistance(2.0*leaf_);
-	//icp_.setMaximumIterations(150);
-	
-	greedy_hv_.setResolution(leaf_);
-	greedy_hv_.setInlierThreshold(leaf_);
+	heuristic_hv_.setResolution(leaf_);
+	heuristic_hv_.setInlierThreshold(1.5*leaf_);
 }
 
 template<typename PointT>
@@ -66,15 +63,14 @@ void PostProcessing<PointT>::setResolution(float leaf)
 {
     leaf_ = leaf;
     
-    greedy_hv_.setResolution(leaf_);
-    greedy_hv_.setInlierThreshold(leaf_);
+	heuristic_hv_.setResolution(leaf_);
+	heuristic_hv_.setInlierThreshold(1.5*leaf_);
 }
 
 template<typename PointT>
 void PostProcessing<PointT>::setInputCluster(PointCloudPtrT cluster)
 {
 	cluster_->clear();
-	
 	typename pcl::VoxelGrid<PointT> down_;
 	down_.setLeafSize (leaf_, leaf_, leaf_);
 	down_.setInputCloud(cluster);
@@ -165,14 +161,14 @@ void PostProcessing<PointT>::verifyHypotheses()
 	
 	//greedy_hv_.setSceneCloud(scene_);
 	//greedy_hv_.setOcclusionCloud(scene_);
-	greedy_hv_.setSceneCloud(cluster_);
-	greedy_hv_.setOcclusionCloud(cluster_);
-	greedy_hv_.addModels(transformed_models, true);
-	greedy_hv_.verify();
+	heuristic_hv_.setSceneCloud(cluster_);
+	heuristic_hv_.setOcclusionCloud(cluster_);
+	heuristic_hv_.addModels(transformed_models, true);
+	heuristic_hv_.verify();
 	std::vector<bool> mask_hv;
-	greedy_hv_.getMask(mask_hv);
+	heuristic_hv_.getMask(mask_hv);
 	std::vector<float> fitness_hv;
-	greedy_hv_.getFitnessScores(fitness_hv);
+	heuristic_hv_.getFitnessScores(fitness_hv);
 	
 	for(unsigned int i = 0; i < mask_hv.size(); ++i)
 	{
@@ -183,7 +179,7 @@ void PostProcessing<PointT>::verifyHypotheses()
 		else
 			bad_hypotheses_.push_back(hypotheses_[i]);
 	}
-	std::sort(good_hypotheses_.begin(), good_hypotheses_.end(), compareHypothesis<PointT>);//INDIN
+	std::sort(good_hypotheses_.begin(), good_hypotheses_.end(), compareHypothesis<PointT>);
 }
 
 template<typename PointT>
