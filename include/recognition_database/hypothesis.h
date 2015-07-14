@@ -12,7 +12,7 @@ struct Hypothesis
 	std::string type;
 	typename pcl::PointCloud<PointT> cloud;
 	Eigen::Matrix4f pose;
-	float fitness;
+	float fitness;//the higher the better
 };
 
 template<typename PointT>
