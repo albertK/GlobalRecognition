@@ -3,9 +3,9 @@
 #include "descriptor_estimation/cvfh_estimation.h"
 #include "descriptor_estimation/ourcvfh_estimation.h"
 #include "pre_processing/pre_processing.h"
+#include "openni_frame_source/openni_frame_source.h"
 
 #include <pcl/console/parse.h>
-#include <pcl/apps/3d_rec_framework/tools/openni_frame_source.h>
 #include <pcl/point_cloud.h>
 #include <pcl/point_types.h>
 #include <pcl/io/pcd_io.h>

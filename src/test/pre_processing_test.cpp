@@ -1,5 +1,6 @@
 #include "pre_processing/pre_processing.h"
-#include <pcl/apps/3d_rec_framework/tools/openni_frame_source.h>
+#include "openni_frame_source/openni_frame_source.h"
+
 #include <pcl/visualization/pcl_visualizer.h>
 #include <pcl/console/parse.h>
 #include <pcl/common/time.h>

@@ -1,7 +1,7 @@
 #include <pcl/console/parse.h>
-#include <pcl/apps/3d_rec_framework/tools/openni_frame_source.h>
 #include <pcl/visualization/pcl_visualizer.h>
 
+#include "openni_frame_source/openni_frame_source.h"
 #include "global_recognition/global_recognition.h"
 
 void keyboardEventOccurred(const pcl::visualization::KeyboardEvent &event, void* viewer_void){}
