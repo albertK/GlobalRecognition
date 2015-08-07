@@ -5,7 +5,9 @@
 #include <boost/shared_ptr.hpp>
 
 #include <pcl/common/time.h>
-#include <pcl/apps/3d_rec_framework/utils/metrics.h>
+
+//#include <pcl/apps/3d_rec_framework/utils/metrics.h>
+#include "metrics.h"
 
 #include "pre_processing/pre_processing.h"
 
